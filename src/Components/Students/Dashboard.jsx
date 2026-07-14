@@ -624,7 +624,7 @@ const Dashboard = ({ token, student, logout }) => {
 
         </div>
       </div>
-
+      </div>
       </main>
       <AlertDialog
         isOpen={alertDialog.isOpen}

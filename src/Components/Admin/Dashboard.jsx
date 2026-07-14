@@ -583,7 +583,15 @@ const Dashboard = ({ token, user, logout }) => {
           },
           body: JSON.stringify({ studentIds })
         });
-        const data = await res.json();
+        
+        const contentType = res.headers.get("content-type");
+        let data = {};
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+          data = await res.json();
+        } else {
+          data = { message: 'Server returned a non-JSON response (possibly still deploying).' };
+        }
+        
         if (res.ok) {
           showAlert(data.message, 'Success', 'success');
           fetchStudents();

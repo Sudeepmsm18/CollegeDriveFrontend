@@ -299,10 +299,6 @@ const Dashboard = ({ token, student, logout }) => {
       <div className="flex flex-col sm:flex-row justify-between items-center mb-10 pb-6 border-b border-slate-200 gap-4">
         <div className="flex items-center space-x-3">
           <img src="/image.png" alt="GWC Logo" className="h-8 object-contain mr-2" />
-          <div>
-            <h1 className="text-xl font-bold text-slate-900 tracking-tight leading-none">College Drive</h1>
-            <span className="text-[10px] text-indigo-600 font-bold uppercase tracking-wider">Student Portal</span>
-          </div>
         </div>
         <div className="flex items-center space-x-4">
           <span className="text-sm text-slate-500">Welcome, <strong className="text-slate-900">{profile.name}</strong></span>

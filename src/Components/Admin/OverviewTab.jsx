@@ -142,6 +142,22 @@ const OverviewTab = ({
           );
         }
 
+        const handleSelectAllFiltered = (e) => {
+          if (e.target.checked) {
+            setSelectedFilteredIds(filteredList.map(s => s._id));
+          } else {
+            setSelectedFilteredIds([]);
+          }
+        };
+
+        const handleSelectFiltered = (id) => {
+          if (selectedFilteredIds.includes(id)) {
+            setSelectedFilteredIds(selectedFilteredIds.filter(i => i !== id));
+          } else {
+            setSelectedFilteredIds([...selectedFilteredIds, id]);
+          }
+        };
+
         return (
           <div className="glass rounded-2xl border border-slate-200 p-6 shadow-lg bg-white animate-fadeIn text-left">
             <div className="flex flex-wrap justify-between items-center mb-6 pb-3 border-b border-slate-100 gap-3">

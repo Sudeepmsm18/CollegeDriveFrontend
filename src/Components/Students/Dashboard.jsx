@@ -294,26 +294,48 @@ const Dashboard = ({ token, student, logout }) => {
   const progressPercentage = questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
 
   return (
-    <div className="min-h-screen py-12 px-4 max-w-6xl mx-auto relative text-slate-800">
-      {/* HEADER NAVBAR */}
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-10 pb-6 border-b border-slate-200 gap-4">
-        <div className="flex items-center space-x-3">
-          <img src="/image.png" alt="GWC Logo" className="h-16 object-contain mr-2" />
+    <div className="flex h-screen bg-slate-50 font-sans text-slate-800 selection:bg-indigo-100 selection:text-indigo-900 overflow-hidden">
+      
+      {/* SIDEBAR (Desktop Only) */}
+      <aside className="w-64 bg-white border-r border-slate-200 flex-col justify-between hidden lg:flex shrink-0 h-full">
+        <div className="p-6 flex justify-center mt-4 border-b border-slate-50 pb-8">
+          <img src="/image.png" alt="GWC Logo" className="h-16 object-contain" />
         </div>
-        <div className="flex items-center space-x-4">
-          <span className="text-sm text-slate-500">Welcome, <strong className="text-slate-900">{profile.name}</strong></span>
+        
+        <div className="p-6 flex-1 flex flex-col justify-end">
           <button
             onClick={logout}
-            className="flex items-center space-x-1.5 py-2 px-3 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-xl transition-colors cursor-pointer text-xs font-semibold"
+            className="w-full flex items-center justify-center space-x-2 py-3 px-4 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-xl transition-colors cursor-pointer text-sm font-semibold"
           >
             <LogOutIcon className="w-4 h-4" />
             <span>Sign Out</span>
           </button>
         </div>
-      </div>
+      </aside>
 
-      {error && (
-        <div className="mb-8 p-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg text-left">
+      {/* MAIN VIEW AREA */}
+      <main className="flex-1 overflow-y-auto relative w-full h-full">
+        
+        {/* MOBILE HEADER NAVBAR */}
+        <div className="lg:hidden flex justify-between items-center p-4 bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+          <div className="flex items-center">
+            <img src="/image.png" alt="GWC Logo" className="h-10 object-contain" />
+          </div>
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={logout}
+              className="flex items-center space-x-1.5 py-1.5 px-3 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg transition-colors cursor-pointer text-xs font-semibold"
+            >
+              <LogOutIcon className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Sign Out</span>
+            </button>
+          </div>
+        </div>
+
+        <div className="py-8 lg:py-12 px-4 md:px-8 max-w-6xl mx-auto w-full relative">
+          
+          {error && (
+            <div className="mb-8 p-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg text-left">
           <span className="font-semibold">Error:</span> {error}
         </div>
       )}
@@ -603,6 +625,7 @@ const Dashboard = ({ token, student, logout }) => {
         </div>
       </div>
 
+      </main>
       <AlertDialog
         isOpen={alertDialog.isOpen}
         title={alertDialog.title}

@@ -21,6 +21,32 @@ const StudentsTab = ({
   selectedStudentIds,
   setSelectedStudentIds
 }) => {
+  const [idRange, setIdRange] = useState('');
+
+  const handleSelectRange = () => {
+    if (!idRange.includes('-')) {
+      showAlert('Please enter a valid range format (e.g. 1-10)', 'Invalid Format', 'error');
+      return;
+    }
+    const [start, end] = idRange.split('-').map(str => parseInt(str.trim(), 10));
+    if (isNaN(start) || isNaN(end) || start > end) {
+      showAlert('Please enter valid numbers for the range (e.g. 1-10)', 'Invalid Range', 'error');
+      return;
+    }
+
+    const idsToSelect = students.filter(stu => {
+      const match = stu.studentId.match(/\d+$/);
+      if (match) {
+        const num = parseInt(match[0], 10);
+        return num >= start && num <= end;
+      }
+      return false;
+    }).map(stu => stu._id);
+
+    const newSelection = new Set([...selectedStudentIds, ...idsToSelect]);
+    setSelectedStudentIds(Array.from(newSelection));
+    setIdRange('');
+  };
   return (
     <div className="space-y-6">
       {/* BATCH CONTROL BOARD */}
@@ -76,9 +102,33 @@ const StudentsTab = ({
 
       {/* STUDENTS TABLE */}
       <div className="glass rounded-2xl border border-slate-200 p-6 shadow-xl animate-fadeIn bg-white text-left">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-lg font-bold text-slate-900">Registered Student Submissions</h2>
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
+          <h2 className="text-lg font-bold text-slate-900 whitespace-nowrap">Registered Student Submissions</h2>
+          
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider hidden xl:inline">Bulk Select:</span>
+            <input
+              type="text"
+              placeholder="ID Range (e.g. 1-5)"
+              value={idRange}
+              onChange={(e) => setIdRange(e.target.value)}
+              className="p-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-900 focus:outline-none focus:border-indigo-500 w-32"
+            />
+            <button
+              onClick={handleSelectRange}
+              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold transition-all cursor-pointer"
+            >
+              Select
+            </button>
+            <button
+              onClick={() => setSelectedStudentIds([])}
+              className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold transition-all cursor-pointer ml-1"
+            >
+              Clear
+            </button>
+          </div>
+
+          <div className="flex items-center gap-3 flex-wrap">
             {selectedStudentIds.length > 0 && (
               <>
                 <button
@@ -96,7 +146,7 @@ const StudentsTab = ({
               </>
             )}
             <span className="text-xs font-semibold text-slate-500">
-              Selected {selectedStudentIds.length} of {students.length} students
+              Selected {selectedStudentIds.length} of {students.length}
             </span>
           </div>
         </div>

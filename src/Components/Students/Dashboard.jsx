@@ -185,6 +185,9 @@ const Dashboard = ({ token, student, logout }) => {
       if (res.ok) {
         const data = await res.json();
         setTestActive(data.testActive);
+        if (data.testDuration) {
+          setTimeLeft(data.testDuration * 60);
+        }
       }
     } catch (err) {
       console.error(err);

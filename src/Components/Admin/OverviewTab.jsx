@@ -13,12 +13,16 @@ const OverviewTab = ({
   const [overviewFilter, setOverviewFilter] = useState(null); // null | 'registered' | 'submitted' | 'average' | 'high'
   const [scoreRange, setScoreRange] = useState({ min: '', max: '', applied: false });
   const [localQuestions, setLocalQuestions] = useState(systemConfig.totalQuestionsToServe || 30);
+  const [localDuration, setLocalDuration] = useState(systemConfig.testDuration || 15);
 
   useEffect(() => {
     if (systemConfig.totalQuestionsToServe !== undefined) {
       setLocalQuestions(systemConfig.totalQuestionsToServe);
     }
-  }, [systemConfig.totalQuestionsToServe]);
+    if (systemConfig.testDuration !== undefined) {
+      setLocalDuration(systemConfig.testDuration);
+    }
+  }, [systemConfig.totalQuestionsToServe, systemConfig.testDuration]);
 
   const handleSaveQuestions = () => {
     const val = Number(localQuestions);
@@ -28,6 +32,16 @@ const OverviewTab = ({
       return;
     }
     handleConfigToggle('totalQuestionsToServe', val);
+  };
+
+  const handleSaveDuration = () => {
+    const val = Number(localDuration);
+    if (isNaN(val) || val < 1 || val > 300) {
+      showAlert('Test duration must be between 1 and 300 minutes.', 'Invalid Value', 'warning');
+      setLocalDuration(systemConfig.testDuration || 15);
+      return;
+    }
+    handleConfigToggle('testDuration', val);
   };
 
   return (
@@ -313,7 +327,7 @@ const OverviewTab = ({
                 />
               </div>
 
-              <div className="flex items-center justify-between p-4 bg-slate-50/50 rounded-xl border border-slate-200 col-span-1 sm:col-span-2">
+              <div className="flex items-center justify-between p-4 bg-slate-50/50 rounded-xl border border-slate-200 col-span-1">
                 <div>
                   <h5 className="text-xs font-bold text-slate-700">Questions per Student</h5>
                   <span className="text-[10px] text-slate-400 font-medium">Dynamic count of test questions served from set</span>
@@ -332,9 +346,33 @@ const OverviewTab = ({
                         e.target.blur();
                       }
                     }}
-                    className="w-20 p-2 bg-white border border-slate-200 rounded-lg text-slate-900 focus:outline-none focus:border-indigo-500 text-xs font-bold text-center"
+                    className="w-16 p-2 bg-white border border-slate-200 rounded-lg text-slate-900 focus:outline-none focus:border-indigo-500 text-xs font-bold text-center"
                   />
-                  <span className="text-xs font-bold text-slate-500">Questions</span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-slate-50/50 rounded-xl border border-slate-200 col-span-1">
+                <div>
+                  <h5 className="text-xs font-bold text-slate-700">Test Duration</h5>
+                  <span className="text-[10px] text-slate-400 font-medium">Time limit in minutes</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="number"
+                    min="1"
+                    max="300"
+                    value={localDuration}
+                    onChange={(e) => setLocalDuration(e.target.value)}
+                    onBlur={handleSaveDuration}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        handleSaveDuration();
+                        e.target.blur();
+                      }
+                    }}
+                    className="w-16 p-2 bg-white border border-slate-200 rounded-lg text-slate-900 focus:outline-none focus:border-indigo-500 text-xs font-bold text-center"
+                  />
+                  <span className="text-xs font-bold text-slate-500">Mins</span>
                 </div>
               </div>
             </div>

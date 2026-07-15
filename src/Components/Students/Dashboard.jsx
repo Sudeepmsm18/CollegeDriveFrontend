@@ -363,7 +363,12 @@ const Dashboard = ({ token, student, logout }) => {
       setExamSubmitted(true);
       fetchProfile(); // reload profile details
     } catch (err) {
-      setError(err.message || 'Failed to submit test. Contact admin.');
+      if (err.message === 'You have already submitted this test') {
+        setExamSubmitted(true);
+        fetchProfile();
+      } else {
+        setError(err.message || 'Failed to submit test. Contact admin.');
+      }
     } finally {
       setLoading(false);
     }

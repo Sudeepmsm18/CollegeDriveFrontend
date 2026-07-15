@@ -456,6 +456,27 @@ const Dashboard = ({ token, user, logout }) => {
     });
   };
 
+  const handleDeleteAllStudents = async () => {
+    showConfirm("Are you absolutely sure you want to DELETE ALL STUDENTS? This will also reset the student ID counter.", async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/students/clear-all`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showAlert(data.message, 'Success', 'success');
+          fetchStudents();
+          fetchStats();
+        } else {
+          showAlert(data.message || 'Failed to delete all students', 'Error', 'error');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }, "DANGER: Delete All Data");
+  };
+
   const handleQuestionSubmit = async (e) => {
     e.preventDefault();
     if (!questionForm.questionText.trim()) return showAlert('Question Text is required', 'Validation Error', 'warning');
@@ -782,6 +803,7 @@ const Dashboard = ({ token, user, logout }) => {
             selectedStudentIds={selectedStudentIds}
             setSelectedStudentIds={setSelectedStudentIds}
             handleDeleteStudents={handleDeleteStudents}
+            handleDeleteAllStudents={handleDeleteAllStudents}
           />
         )}
 

@@ -20,7 +20,8 @@ const StudentsTab = ({
   setSelectedBatch,
   selectedStudentIds,
   setSelectedStudentIds,
-  handleDeleteStudents
+  handleDeleteStudents,
+  handleDeleteAllStudents
 }) => {
   const [idRange, setIdRange] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -100,6 +101,12 @@ const StudentsTab = ({
                 className="px-3.5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl cursor-pointer transition-all border border-slate-800"
               >
                 Assign Batch
+              </button>
+              <button
+                onClick={handleDeleteAllStudents}
+                className="px-3.5 py-2.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl cursor-pointer transition-all border border-red-600"
+              >
+                Delete All Students
               </button>
             </div>
           </div>

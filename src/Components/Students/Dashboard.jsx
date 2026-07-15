@@ -186,8 +186,7 @@ const Dashboard = ({ token, student, logout }) => {
       doc.text(`College: ${profile.collegeName}`, 14, 74);
       doc.text(`Email: ${profile.email}`, 100, 53);
       doc.text(`Phone: ${profile.phone}`, 100, 60);
-      doc.text(`Batch: ${profile.batch || 'Unassigned'}`, 100, 67);
-      doc.text(`Set: ${profile.assignedSet}`, 100, 74);
+      doc.text(`Batch: ${profile.batch || 'Unassigned'}   |   Set: ${profile.assignedSet}`, 100, 67);
       
       // Score & Status
       doc.setFontSize(14);

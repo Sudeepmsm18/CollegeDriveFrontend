@@ -49,8 +49,7 @@ const ReportsTab = ({ students }) => {
       doc.text(`College: ${student.collegeName}`, 14, 74);
       doc.text(`Email: ${student.email}`, 100, 53);
       doc.text(`Phone: ${student.phone}`, 100, 60);
-      doc.text(`Batch: ${student.batch || 'Unassigned'}`, 100, 67);
-      doc.text(`Set: ${student.assignedSet}`, 100, 74);
+      doc.text(`Batch: ${student.batch || 'Unassigned'}   |   Set: ${student.assignedSet}`, 100, 67);
       
       // Score & Status
       doc.setFontSize(14);

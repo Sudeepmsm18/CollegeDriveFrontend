@@ -108,7 +108,7 @@ const Dashboard = ({ token, student, logout }) => {
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [examStarted, examSubmitted]);
 
-  // Window blur (Anti-screenshot Snipping tool detection)
+  // Window blur and Fullscreen exit detection
   useEffect(() => {
     const handleBlur = () => {
       if (examStarted && !examSubmitted) {
@@ -116,14 +116,23 @@ const Dashboard = ({ token, student, logout }) => {
       }
     };
     const handleFocus = () => {
-      setIsWindowBlurred(false);
+      // Don't auto-remove blur on focus, force them to click the Resume button so we can trigger fullscreen
+    };
+
+    const handleFullscreenChange = () => {
+      if (examStarted && !examSubmitted && !document.fullscreenElement) {
+        setIsWindowBlurred(true);
+      }
     };
 
     window.addEventListener('blur', handleBlur);
     window.addEventListener('focus', handleFocus);
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    
     return () => {
       window.removeEventListener('blur', handleBlur);
       window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
     };
   }, [examStarted, examSubmitted]);
 
@@ -275,6 +284,19 @@ const Dashboard = ({ token, student, logout }) => {
       setQuestions(data.questions);
       setExamStarted(true);
       
+      // Request Fullscreen for anti-cheat
+      try {
+        if (document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen();
+        } else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
+          await document.documentElement.webkitRequestFullscreen();
+        } else if (document.documentElement.msRequestFullscreen) { /* IE11 */
+          await document.documentElement.msRequestFullscreen();
+        }
+      } catch (e) {
+        console.log('Fullscreen failed:', e);
+      }
+      
       // Initialize selectedAnswers
       const initialAnswers = {};
       data.questions.forEach(q => {
@@ -365,7 +387,7 @@ const Dashboard = ({ token, student, logout }) => {
         
         <div className="p-6 flex-1 flex flex-col justify-end">
           <button
-            onClick={logout}
+            onClick={() => showConfirm('Are you sure you want to sign out?', logout, 'Confirm Sign Out')}
             className="w-full flex items-center justify-center space-x-2 py-3 px-4 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-xl transition-colors cursor-pointer text-sm font-semibold"
           >
             <LogOutIcon className="w-4 h-4" />
@@ -384,7 +406,7 @@ const Dashboard = ({ token, student, logout }) => {
           </div>
           <div className="flex items-center space-x-3">
             <button
-              onClick={logout}
+              onClick={() => showConfirm('Are you sure you want to sign out?', logout, 'Confirm Sign Out')}
               className="flex items-center space-x-1.5 py-1.5 px-3 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg transition-colors cursor-pointer text-xs font-semibold"
             >
               <LogOutIcon className="w-3.5 h-3.5" />
@@ -483,24 +505,37 @@ const Dashboard = ({ token, student, logout }) => {
           {examStarted && !examSubmitted && questions.length > 0 && (
             <div className="relative">
               {isWindowBlurred && (
-                <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-slate-900/60 backdrop-blur-md rounded-2xl p-6 text-center text-white">
-                  <div className="p-4 bg-red-600 rounded-full mb-4 shadow-lg">
-                    <AlertCircleIcon className="w-10 h-10 text-white" />
+                <div className="absolute inset-0 z-[100] flex flex-col items-center justify-center bg-slate-900/95 backdrop-blur-xl rounded-2xl p-6 text-center text-white">
+                  <div className="p-4 bg-red-600 rounded-full mb-4 shadow-lg animate-pulse">
+                    <AlertCircleIcon className="w-12 h-12 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold mb-2">Security Warning</h3>
-                  <p className="text-sm max-w-md mb-6 opacity-90">
-                    Screen blurred to prevent screenshots or tab switching. Please click the button below to resume the test.
+                  <h3 className="text-2xl font-bold mb-3 text-red-400">Security Warning: Focus Lost</h3>
+                  <p className="text-base max-w-md mb-8 text-slate-300">
+                    You have clicked away from the exam window or exited full-screen mode. 
+                    The exam content is hidden to prevent unauthorized activity.
                   </p>
                   <button
-                    onClick={() => { window.focus(); setIsWindowBlurred(false); }}
-                    className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md cursor-pointer transition-all active:scale-95"
+                    onClick={async () => { 
+                      try {
+                        if (document.documentElement.requestFullscreen) {
+                          await document.documentElement.requestFullscreen();
+                        } else if (document.documentElement.webkitRequestFullscreen) {
+                          await document.documentElement.webkitRequestFullscreen();
+                        } else if (document.documentElement.msRequestFullscreen) {
+                          await document.documentElement.msRequestFullscreen();
+                        }
+                      } catch (e) { console.log(e); }
+                      setIsWindowBlurred(false); 
+                    }}
+                    className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-900/50 cursor-pointer transition-all active:scale-95"
                   >
-                    Resume Test
+                    Return to Full-Screen and Resume Test
                   </button>
                 </div>
               )}
 
-              <div className={`glass rounded-2xl border border-slate-200/80 p-8 shadow-xl text-left relative bg-white select-none ${isWindowBlurred ? 'blur-md pointer-events-none' : ''}`}>
+              <div className="glass rounded-2xl border border-slate-200/80 p-8 shadow-xl text-left relative bg-white select-none overflow-hidden">
+
               {/* Exam Header */}
               <div className="flex flex-col sm:flex-row justify-between items-center pb-5 border-b border-slate-100 mb-6 gap-4">
                 <div>

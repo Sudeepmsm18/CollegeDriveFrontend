@@ -4,6 +4,127 @@ import AlertDialog from '../AlertDialog';
 import API_BASE from '../../api';
 import jsPDF from 'jspdf';
 
+// Detects if a string contains code-like content
+const looksLikeCode = (text) => {
+  const codePatterns = [
+    /\bdef \w+\s*\(/,           // Python function: def foo(
+    /\bprint\s*\(/,              // Python print(
+    /\bfor\s+\w+\s+in\s+/,       // Python for x in
+    /\bwhile\s*\(/,              // while loop
+    /\bif\s+.+:/,                // Python if ...:
+    /\bclass\s+\w+/,             // class definition
+    /=>\s*{/,                    // JS arrow function
+    /function\s*\w*\s*\(/,       // JS function
+    /console\.log\s*\(/,         // console.log
+    /\blet\s+\w+|\bconst\s+\w+|\bvar\s+\w+/, // JS variable declarations
+    /\w+\.append\s*\(/,          // list.append(
+    /\w+\.push\s*\(/,            // array.push(
+    /[{}];?\s*$/m,               // lines ending with {} or {};
+    /^\s{2,}\S/m,                // indented code lines
+    /:\s*\n/m,                   // Python block starters
+  ];
+  return codePatterns.some(pattern => pattern.test(text));
+};
+
+// Auto-formats single-line code into properly indented multi-line code
+const formatCode = (code) => {
+  // If the code already has newlines, preserve them as-is
+  if (code.includes('\n')) return code;
+
+  let result = '';
+  let indent = 0;
+  const INDENT = '  '; // 2 spaces per level
+  let i = 0;
+
+  while (i < code.length) {
+    const ch = code[i];
+
+    if (ch === '{') {
+      result += ' {\n';
+      indent++;
+      result += INDENT.repeat(indent);
+      // skip whitespace after {
+      while (i + 1 < code.length && code[i + 1] === ' ') i++;
+    } else if (ch === '}') {
+      indent = Math.max(0, indent - 1);
+      result = result.trimEnd();
+      result += '\n' + INDENT.repeat(indent) + '}';
+      // peek: if next non-space is not ; or ) or , then add newline
+      let peek = i + 1;
+      while (peek < code.length && code[peek] === ' ') peek++;
+      if (peek < code.length && code[peek] !== ';' && code[peek] !== ')' && code[peek] !== ',') {
+        result += '\n' + INDENT.repeat(indent);
+      }
+    } else if (ch === ';') {
+      result += ';\n' + INDENT.repeat(indent);
+      // skip trailing space after ;
+      while (i + 1 < code.length && code[i + 1] === ' ') i++;
+    } else if (ch === ':' && /\s/.test(code[i + 1] || ' ')) {
+      // Python block opener (if/for/def/while ending with colon)
+      result += ':\n';
+      indent++;
+      result += INDENT.repeat(indent);
+      while (i + 1 < code.length && code[i + 1] === ' ') i++;
+    } else {
+      result += ch;
+    }
+    i++;
+  }
+
+  return result.trim();
+};
+
+// Splits question text into plain text part and code part
+const parseQuestion = (text) => {
+  const lines = text.split('\n');
+  let splitIndex = -1;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (
+      line.match(/^(def |print|for |while |if |class |let |const |var |function |console\.log|#include|import |public )/) ||
+      line.match(/^[a-zA-Z_]\w*\s*=\s*[^=]/) ||
+      line.match(/[{}();]$/) ||
+      line.match(/^\s{2,}\S/)
+    ) {
+      splitIndex = i;
+      break;
+    }
+  }
+
+  if (splitIndex === -1 || splitIndex === 0) {
+    return { prose: '', code: looksLikeCode(text) ? text : null, fullText: text };
+  }
+
+  return {
+    prose: lines.slice(0, splitIndex).join('\n').trim(),
+    code: lines.slice(splitIndex).join('\n').trim(),
+    fullText: text
+  };
+};
+
+// Component that smartly renders a question with optional code block
+const QuestionRenderer = ({ text }) => {
+  const { prose, code, fullText } = parseQuestion(text);
+
+  if (!code) {
+    return <span>{fullText}</span>;
+  }
+
+  const formattedCode = formatCode(code);
+
+  return (
+    <span>
+      {prose && <span className="block mb-3">{prose}</span>}
+      <code
+        className="block w-full text-left font-mono text-sm bg-slate-900 text-green-300 rounded-xl px-5 py-4 mt-1 leading-relaxed whitespace-pre overflow-x-auto border border-slate-700 shadow-inner"
+      >
+        {formattedCode}
+      </code>
+    </span>
+  );
+};
+
 const Dashboard = ({ token, student, logout }) => {
   const [profile, setProfile] = useState(student);
   const [testActive, setTestActive] = useState(true);
@@ -564,7 +685,7 @@ const Dashboard = ({ token, student, logout }) => {
               {/* Question Text */}
               <div className="mb-8">
                 <h4 className="text-lg md:text-xl font-semibold text-slate-900 leading-relaxed">
-                  {questions[currentIndex].questionText}
+                  <QuestionRenderer text={questions[currentIndex].questionText} />
                 </h4>
               </div>
 

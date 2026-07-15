@@ -97,7 +97,7 @@ const BatchesTab = ({
                     <span className={`w-2.5 h-2.5 rounded-full ${isExamActive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}`} />
                     Batch Exam Status: {isExamActive ? <span className="text-emerald-600 font-bold">Active / Running</span> : <span className="text-slate-500">Not Started</span>}
                   </h4>
-                  <p className="text-[11px] text-slate-500 mt-0.5">Configure exam settings and start/stop the exam for all students in this batch.</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Start or stop the exam for all students in this batch.</p>
                 </div>
 
                 <button
@@ -110,52 +110,6 @@ const BatchesTab = ({
                 >
                   {isExamActive ? '⏹ Stop Exam' : '▶ Start Exam'}
                 </button>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-3 border-t border-slate-200/60">
-                {/* Questions input */}
-                <div className="space-y-1">
-                  <label className="block text-[11px] font-bold text-slate-500 uppercase">Questions to Serve</label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="100"
-                    value={batchExamConfig.totalQuestionsToServe}
-                    onChange={(e) => setBatchExamConfig(prev => ({ ...prev, totalQuestionsToServe: Number(e.target.value) }))}
-                    disabled={isExamActive}
-                    className="w-full p-2 bg-white border border-slate-200 rounded-lg text-slate-900 focus:outline-none focus:border-indigo-500 text-xs font-bold"
-                  />
-                </div>
-
-                {/* Shuffle questions */}
-                <div className="flex items-center justify-between p-2.5 bg-white rounded-lg border border-slate-200">
-                  <div>
-                    <span className="block text-[11px] font-bold text-slate-700">Shuffle Questions</span>
-                    <span className="text-[9px] text-slate-400">Randomize order</span>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={batchExamConfig.shuffleQuestions}
-                    onChange={(e) => setBatchExamConfig(prev => ({ ...prev, shuffleQuestions: e.target.checked }))}
-                    disabled={isExamActive}
-                    className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 bg-white border-slate-300 cursor-pointer"
-                  />
-                </div>
-
-                {/* Shuffle options */}
-                <div className="flex items-center justify-between p-2.5 bg-white rounded-lg border border-slate-200">
-                  <div>
-                    <span className="block text-[11px] font-bold text-slate-700">Shuffle Options</span>
-                    <span className="text-[9px] text-slate-400">Randomize choices</span>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={batchExamConfig.shuffleOptions}
-                    onChange={(e) => setBatchExamConfig(prev => ({ ...prev, shuffleOptions: e.target.checked }))}
-                    disabled={isExamActive}
-                    className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 bg-white border-slate-300 cursor-pointer"
-                  />
-                </div>
               </div>
             </div>
           );

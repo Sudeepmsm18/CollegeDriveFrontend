@@ -90,20 +90,31 @@ const ReportsTab = ({ students }) => {
 
     if (exportList.length === 0) return;
     
-    const data = exportList.map(stu => ({
-      'Student ID': stu.studentId,
-      'Name': stu.name,
-      'USN': stu.usn,
-      'Email': stu.email,
-      'Phone': stu.phone,
-      'College': stu.collegeName,
-      'Batch': stu.batch || 'Unassigned',
-      'Set': stu.assignedSet,
-      'Status': stu.testSubmitted ? "Completed" : (stu.testStarted ? "In Progress" : "Registered"),
-      'Score': stu.testSubmitted ? stu.score : 'N/A',
-      'Started At': stu.testStartedAt ? new Date(stu.testStartedAt).toLocaleString() : 'N/A',
-      'Submitted At': stu.testSubmittedAt ? new Date(stu.testSubmittedAt).toLocaleString() : 'N/A'
-    }));
+    const data = exportList.map(stu => {
+      let timeTaken = 'N/A';
+      if (stu.testSubmittedAt && stu.testStartedAt) {
+        const durationMs = new Date(stu.testSubmittedAt) - new Date(stu.testStartedAt);
+        const durationMins = Math.floor(durationMs / 60000);
+        const durationSecs = Math.floor((durationMs % 60000) / 1000);
+        timeTaken = `${durationMins}m ${durationSecs}s`;
+      }
+
+      return {
+        'Student ID': stu.studentId,
+        'Name': stu.name,
+        'USN': stu.usn,
+        'Email': stu.email,
+        'Phone': stu.phone,
+        'College': stu.collegeName,
+        'Batch': stu.batch || 'Unassigned',
+        'Set': stu.assignedSet,
+        'Status': stu.testSubmitted ? "Completed" : (stu.testStarted ? "In Progress" : "Registered"),
+        'Score': stu.testSubmitted ? stu.score : 'N/A',
+        'Started At': stu.testStartedAt ? new Date(stu.testStartedAt).toLocaleString() : 'N/A',
+        'Submitted At': stu.testSubmittedAt ? new Date(stu.testSubmittedAt).toLocaleString() : 'N/A',
+        'Time Taken': timeTaken
+      };
+    });
 
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();

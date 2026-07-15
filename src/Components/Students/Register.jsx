@@ -129,7 +129,7 @@ const Register = ({ setView }) => {
                 value={formData.name}
                 onChange={handleChange}
                 className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-medium"
-                placeholder="e.g. Sudip Shankar"
+                placeholder="e.g. Your Name"
                 required
               />
             </div>

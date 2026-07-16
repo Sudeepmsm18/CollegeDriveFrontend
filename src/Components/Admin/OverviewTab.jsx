@@ -319,6 +319,25 @@ const OverviewTab = ({
               </div>
             ))}
           </div>
+
+          <div className="mt-6 border-t border-slate-100 pt-4">
+            <div className="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-200">
+              <div>
+                <h4 className="text-sm font-bold text-slate-800">Registration Status</h4>
+                <p className="text-[10px] text-slate-500 mt-0.5">Toggle to allow or block new student sign-ups.</p>
+              </div>
+              <button
+                onClick={() => handleConfigToggle('isRegistrationOpen', systemConfig.isRegistrationOpen === false ? true : false)}
+                className={`py-1.5 px-3 rounded-md text-xs font-semibold border transition-all cursor-pointer ${
+                  systemConfig.isRegistrationOpen !== false
+                    ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                    : 'bg-red-50 border-red-200 text-red-700'
+                }`}
+              >
+                {systemConfig.isRegistrationOpen !== false ? 'OPEN (Allow)' : 'CLOSED (Block)'}
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Config & Controls */}

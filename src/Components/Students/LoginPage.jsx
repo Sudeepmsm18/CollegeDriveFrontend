@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MailIcon, LockIcon, EyeIcon, EyeOffIcon } from '../Icons';
 import API_BASE from '../../api';
 
@@ -11,6 +11,18 @@ const LoginPage = ({ setView, setStudentAuth, setAdminAuth }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isRegistrationOpen, setIsRegistrationOpen] = useState(true);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/config`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.isRegistrationOpen === false) {
+          setIsRegistrationOpen(false);
+        }
+      })
+      .catch(err => console.error('Failed to fetch config:', err));
+  }, []);
 
   const handleChange = (e) => {
     setFormData({
@@ -105,7 +117,8 @@ const LoginPage = ({ setView, setStudentAuth, setAdminAuth }) => {
           {/* Password */}
           <div>
             <label htmlFor="loginPassword" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-              Password <span className="text-[10px] text-slate-400 lowercase font-normal">(optional for staff)</span>
+              Password 
+              {/* <span className="text-[10px] text-slate-400 lowercase font-normal">(optional for staff)</span> */}
             </label>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
@@ -149,17 +162,19 @@ const LoginPage = ({ setView, setStudentAuth, setAdminAuth }) => {
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm">
-          <p className="text-slate-500">
-            Are you a student with no credentials?{' '}
-            <button
-              onClick={() => setView('student-register')}
-              className="text-indigo-600 hover:text-indigo-500 font-semibold transition-colors cursor-pointer"
-            >
-              Register Now
-            </button>
-          </p>
-        </div>
+        {isRegistrationOpen && (
+          <div className="mt-6 text-center text-sm">
+            <p className="text-slate-500">
+              Are you a student with no credentials?{' '}
+              <button
+                onClick={() => setView('student-register')}
+                className="text-indigo-600 hover:text-indigo-500 font-semibold transition-colors cursor-pointer"
+              >
+                Register Now
+              </button>
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
